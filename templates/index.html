@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="static/index.css" />
+        <title>Pong</title>
+    </head>
+    <body>
+        <img id="ball" class="ball" style="left: 50%; bottom: 50%;" src="static/ball/ball1.png">
+        <script>
+            window.onload = function() {          
+            var left = 5;
+            var velocity = 0.03
+            function moveball() {
+                document.getElementById("ball").style.left = left+"%";
+                left+=velocity;
+            }
+            setInterval(moveball, 1);
+        }
+        </script>
+    </body>
+</html>
