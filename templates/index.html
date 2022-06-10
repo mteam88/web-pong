@@ -19,13 +19,21 @@
                 "top": 100,
                 "bottom": 0
             });
-            var allballs = [new Ball("ball", 90, 50, 0.2, 0.4, maingame, "img"),new Ball("ball2", 90, 50, 0.3, 1, maingame, "img"),new Ball("ball3", 50, 50, 0.05, 0.9, maingame, "img"),new Ball("ball4", 90, 50, -0.6, 0.6, maingame, "img"),new Ball("ball5", 50, 50, 0.5, 0, maingame, "img")]
-            var allplayers = [new Player("player1", 0, 50, 0, 0, maingame, "img")]
+            var allballs = [new Ball("ball", 90, 50, 0.2, 0.4, maingame, "img"),new Ball("ball2", 90, 50, 0.3, 1, maingame, "img"),new Ball("ball3", 50, 50, 0.05, 0.9, maingame, "img"),new Ball("ball4", 90, 50, -0.6, 0.6, maingame, "img"),new Ball("ball5", 50, 50, 0.5, 0, maingame, "img")];
+            var allplayers = [new Player("left","player1", 0, 50, 0, 0, maingame, "img")];
+
+            allplayers.forEach(player => {
+                maingame.players.push(player);
+            })
+
             setInterval(function () {
                 allballs.forEach(ball => {
                     ball.checkiftouchingwall();
                     ball.move();
-                })
+                });
+                allplayers.forEach(player => {
+                    player.showscore();
+                });
             }, 1);
             alert(JSON.stringify(document.body.getElementsByTagName("*"), null, 4));
         }
@@ -86,25 +94,42 @@
             }
 
             class Player extends DynamicGameObject{
-                constructor(...args){
+                constructor(goalside, ...args){
                     super(...args);
+
+                    this.goalside = goalside
+
+                    this.score = 0;
                     this.elem.style.position = "absolute";
                     this.elem.style.left = this.x+"%";
                     this.elem.style.bottom =this.y+"%";
                     this.elem.classList.add("player");
                     this.elem.src = "static/player/player1.png";
+
+                    this.scorelabel = document.createElement('p');
+                    this.scorelabel.classList.add("scorelabel");
+                    document.body.appendChild(this.scorelabel);
+                }
+
+                showscore() {
+                    this.scorelabel.innerText = "Score: " + this.score;
                 }
             }
 
             class Game{
                 constructor(borders){
                     this.borders=borders;
+                    this.players=[]
                 }
                 gameover(){
                     alert("game over")
                 }
                 sidehit(side){
-
+                    this.players.forEach(player => {
+                        if (player.goalside === side) {
+                            player.score++
+                        }
+                    });
                 }
             }
         </script>
