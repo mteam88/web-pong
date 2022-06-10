@@ -28,7 +28,7 @@
 
             setInterval(function () {
                 allballs.forEach(ball => {
-                    ball.checkiftouchingwall();
+                    ball.bounce();
                     ball.move();
                 });
                 allplayers.forEach(player => {
@@ -58,7 +58,8 @@
                     this.y+=this.yvelocity;                    
                     this.elem.style.bottom = this.y+"%";
                 }
-                checkiftouchingwall(){
+                bounce(){
+                    //this.game.bouncers.forEach(); //finish later
                     if (this.x + this.elem.style.width >= this.game.borders.right) {
                         this.game.sidehit("right");
                         this.xvelocity *= -1;
@@ -116,10 +117,32 @@
                 }
             }
 
+
+            class Bouncer{
+                constructor(hitbox) {
+                    this.hitbox = hitbox
+                    //hitbox example
+                    //{
+                        //"topleft": [x, y],
+                        //"bottomright": [x,y] 
+                    //}
+                }
+                FindPoint(x1, y1, x2, y2, x, y) {
+                    if (x > x1 && x < x2 && y > y1 && y < y2) return true;
+                    return false;
+                }
+                isthistouching(bouncer){
+                    if (FindPoint(...bouncer.hitbox.topleft, ...bouncer.hitbox.bottomright, ...this.hitbox.topleft) || FindPoint(...bouncer.hitbox.topleft, ...bouncer.hitbox.bottomright, ...this.hitbox.topleft)) {
+                        return true;}
+                    return false;
+                }
+            }
+
             class Game{
                 constructor(borders){
                     this.borders=borders;
                     this.players=[]
+                    this.bouncers = [];
                 }
                 gameover(){
                     alert("game over")
