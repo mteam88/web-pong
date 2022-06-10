@@ -7,17 +7,91 @@
         <title>Pong</title>
     </head>
     <body>
-        <img id="ball" class="ball" style="left: 50%; bottom: 50%;" src="static/ball/ball1.png">
         <script>
-            window.onload = function() {          
-            var left = 5;
-            var velocity = 0.03
-            function moveball() {
-                document.getElementById("ball").style.left = left+"%";
-                left+=velocity;
-            }
-            setInterval(moveball, 1);
+        window.onerror = function(msg, url, linenumber) {
+            alert('Error message: '+msg+'\nURL: '+url+'\nLine Number: '+linenumber);
+            return true;
         }
+        window.onload = function() {
+            var maingame = new Game({
+                "left": 0,
+                "right": 100,
+                "top": 100,
+                "bottom": 0
+            });
+            var allballs = [new Ball("ball", 90, 50, 0.2, 0.4, maingame),new Ball("ball2", 90, 50, 0.3, 1, maingame),new Ball("ball3", 50, 50, 0.05, 0.9, maingame),new Ball("ball4", 90, 50, -0.6, 0.6, maingame),new Ball("ball5", 50, 50, 0.5, 0, maingame),]
+            setInterval(function () {
+                allballs.forEach(ball => {
+                    ball.checkiftouchingwall();
+                    ball.move();
+                })
+            }, 1);
+            alert(JSON.stringify(document.body.getElementsByTagName("*"), null, 4));
+        }
+
+        class DynamicGameObject{
+                constructor(id, x,y, xvelocity, yvelocity, game, elemtype){
+                    this.elem = document.createElement(elemtype);
+                    document.body.appendChild(this.elem);
+                    
+                    this.elem.id = id
+                    this.id=id;
+                    this.x=x;
+                    this.y=y;
+                    this.xvelocity=xvelocity;
+                    this.yvelocity=yvelocity;
+                    this.game=game;
+                }
+                move(){
+                    //alert(this.elem.src);
+                    this.x+=this.xvelocity;
+                    this.elem.style.left = this.x+"%";
+                    this.y+=this.yvelocity;                    
+                    this.elem.style.bottom = this.y+"%";
+                }
+                checkiftouchingwall(){
+                    if (this.x + this.elem.style.width >= this.game.borders.right) {
+                        //this.game.gameover();
+                        this.xvelocity *= -1;
+                        this.x -= 0.001;
+                        return true;
+                    } else if (this.x <= this.game.borders.left) {
+                        //this.game.gameover();
+                        this.xvelocity *= -1;
+                        this.x += 0.001;
+                        return true;
+                    } else if (this.y + this.elem.style.width <= this.game.borders.bottom) {
+                        this.yvelocity *= -1;
+                        this.y += 0.001;
+                        return true;
+                    } else if (this.y >= this.game.borders.top) {
+                        this.yvelocity *= -1;
+                        this.y -= 0.001;
+                        return true;
+                    }
+                    return false;
+                }
+            }
+
+            class Ball extends DynamicGameObject{
+                constructor(...args){
+                    super(...args);
+                    this.elem.style.position = "absolute";
+                    this.elem.style.left = this.x+"%";
+                    this.elem.style.bottom =this.y+"%";
+                    this.elem.classList.add("ball");
+                    this.elem.src = "static/ball/ball1.png";
+                }
+            }
+
+            class Game{
+                constructor(borders){
+                    this.borders=borders;
+                }
+                gameover(){
+                    alert("game over")
+                }
+            }
         </script>
     </body>
 </html>
