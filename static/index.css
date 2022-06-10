@@ -1,9 +1,14 @@
 .ball {
     position: absolute;
     width: 2%;
+    background-color: transparent;
 }
 
 .player {
     width: 2%;
     height: 25%;
+}
+
+.scorelabel {
+    font-size: large;
 }
