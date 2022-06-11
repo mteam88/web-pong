@@ -63,12 +63,12 @@
                     if (this.x + this.elem.style.width >= this.game.borders.right) {
                         this.game.sidehit("right");
                         this.xvelocity *= -1;
-                        this.x -= 0.001;
+                        this.x = 50;
                         return true;
                     } else if (this.x <= this.game.borders.left) {
                         this.game.sidehit("left");
                         this.xvelocity *= -1;
-                        this.x += 0.001;
+                        this.x = 50;
                         return true;
                     } else if (this.y + this.elem.style.width <= this.game.borders.bottom) {
                         this.yvelocity *= -1;
