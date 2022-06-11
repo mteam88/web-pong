@@ -22,6 +22,9 @@
             var allballs = [new Ball("ball", 90, 50, 0.2, 0.4, maingame, "img"),new Ball("ball2", 90, 50, 0.3, 1, maingame, "img"),new Ball("ball3", 50, 50, 0.05, 0.9, maingame, "img"),new Ball("ball4", 90, 50, -0.6, 0.6, maingame, "img"),new Ball("ball5", 50, 50, 0.5, 0, maingame, "img")];
             var allplayers = [new Player("left","player1", 0, 50, 0, 0, maingame, "img")];
 
+            maingame.bouncers.push(new Wall({"topleft": [100, 0], "bottomright": [0, 0]}))
+
+
             allplayers.forEach(player => {
                 maingame.players.push(player);
             })
@@ -38,6 +41,14 @@
             alert(JSON.stringify(document.body.getElementsByTagName("*"), null, 4));
         }
 
+        class StaticGameObject{
+            constructor(hitbox){
+                this.hitbox = new Bouncer(hitbox);
+            }
+        }
+
+        class Wall extends StaticGameObject {}
+
         class DynamicGameObject{
                 constructor(id, x,y, xvelocity, yvelocity, game, elemtype){
                     this.elem = document.createElement(elemtype);
@@ -50,6 +61,7 @@
                     this.xvelocity=xvelocity;
                     this.yvelocity=yvelocity;
                     this.game=game;
+                    this.bouncer = new Bouncer({"topleft": [this.x, this.y], "bottomright": [this.x+this.elem.style.width, this.y-this.elem.style.height]})
                 }
                 move(){
                     //alert(this.elem.src);
@@ -57,29 +69,6 @@
                     this.elem.style.left = this.x+"%";
                     this.y+=this.yvelocity;                    
                     this.elem.style.bottom = this.y+"%";
-                }
-                bounce(){
-                    //this.game.bouncers.forEach(); //finish later
-                    if (this.x + this.elem.style.width >= this.game.borders.right) {
-                        this.game.sidehit("right");
-                        this.xvelocity *= -1;
-                        this.x = 50;
-                        return true;
-                    } else if (this.x <= this.game.borders.left) {
-                        this.game.sidehit("left");
-                        this.xvelocity *= -1;
-                        this.x = 50;
-                        return true;
-                    } else if (this.y + this.elem.style.width <= this.game.borders.bottom) {
-                        this.yvelocity *= -1;
-                        this.y += 0.001;
-                        return true;
-                    } else if (this.y >= this.game.borders.top) {
-                        this.yvelocity *= -1;
-                        this.y -= 0.001;
-                        return true;
-                    }
-                    return false;
                 }
             }
 
@@ -92,13 +81,25 @@
                     this.elem.classList.add("ball");
                     this.elem.src = "static/ball/ball1.png";
                 }
+
+                bounce(){
+                    this.game.bouncers.forEach(bouncer => {
+                        if (this.bouncer.isthistouching(bouncer)) {
+                            this.game.touchevent(this, bouncer);
+                            this.xvelocity *= -1;
+                            this.x = 50;
+                            this.yvelocity *= -1;
+                            this.y = 50;
+                            return true;
+                        }
+                        return false;
+                    });
+                }
             }
 
             class Player extends DynamicGameObject{
                 constructor(goalside, ...args){
                     super(...args);
-
-                    this.goalside = goalside
 
                     this.score = 0;
                     this.elem.style.position = "absolute";
@@ -114,6 +115,13 @@
 
                 showscore() {
                     this.scorelabel.innerText = "Score: " + this.score;
+                }
+
+                touched(gameobject) {
+                    alert("touched called");
+                    if (typeof gameobject == "Ball") {
+                        this.score++
+                    }
                 }
             }
 
@@ -132,6 +140,7 @@
                     return false;
                 }
                 isthistouching(bouncer){
+                    alert("isthistouching called");
                     if (FindPoint(...bouncer.hitbox.topleft, ...bouncer.hitbox.bottomright, ...this.hitbox.topleft) || FindPoint(...bouncer.hitbox.topleft, ...bouncer.hitbox.bottomright, ...this.hitbox.topleft)) {
                         return true;}
                     return false;
@@ -147,7 +156,8 @@
                 gameover(){
                     alert("game over")
                 }
-                sidehit(side){
+                touchevent(gameobject, obstacle){
+                    obstacle.touched(gameobject)
                     this.players.forEach(player => {
                         if (player.goalside === side) {
                             player.score++
