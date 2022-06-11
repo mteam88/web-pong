@@ -22,7 +22,7 @@
             var allballs = [new Ball("ball", 90, 50, 0.2, 0.4, maingame, "img"),new Ball("ball2", 90, 50, 0.3, 1, maingame, "img"),new Ball("ball3", 50, 50, 0.05, 0.9, maingame, "img"),new Ball("ball4", 90, 50, -0.6, 0.6, maingame, "img"),new Ball("ball5", 50, 50, 0.5, 0, maingame, "img")];
             var allplayers = [new Player("left","player1", 0, 50, 0, 0, maingame, "img")];
 
-            maingame.bouncers.push(new Wall({"topleft": [100, 0], "bottomright": [0, 0]}))
+            maingame.bouncers.push(new Wall({"topleft": [100, 100], "bottomright": [0, 400]}))
 
 
             allplayers.forEach(player => {
@@ -140,8 +140,9 @@
                     return false;
                 }
                 isthistouching(bouncer){
-                    alert("isthistouching called");
-                    if (this.FindPoint(...bouncer.hitbox.topleft, ...bouncer.hitbox.bottomright, ...this.hitbox.topleft) || FindPoint(...bouncer.hitbox.topleft, ...bouncer.hitbox.bottomright, ...this.hitbox.topleft)) {
+                    console.log(bouncer.hitbox.hitbox)
+                    if (this.FindPoint(...bouncer.hitbox.hitbox['topleft'], ...bouncer.hitbox.hitbox['bottomright'], ...this.hitbox['topleft']) || this.FindPoint(...bouncer.hitbox.hitbox['topleft'], ...bouncer.hitbox.hitbox['bottomright'], ...this.hitbox['topleft'])) {
+                        alert("touching")
                         return true;}
                     return false;
                 }
