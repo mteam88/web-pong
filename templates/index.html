@@ -141,7 +141,7 @@
                 }
                 isthistouching(bouncer){
                     alert("isthistouching called");
-                    if (FindPoint(...bouncer.hitbox.topleft, ...bouncer.hitbox.bottomright, ...this.hitbox.topleft) || FindPoint(...bouncer.hitbox.topleft, ...bouncer.hitbox.bottomright, ...this.hitbox.topleft)) {
+                    if (this.FindPoint(...bouncer.hitbox.topleft, ...bouncer.hitbox.bottomright, ...this.hitbox.topleft) || FindPoint(...bouncer.hitbox.topleft, ...bouncer.hitbox.bottomright, ...this.hitbox.topleft)) {
                         return true;}
                     return false;
                 }
