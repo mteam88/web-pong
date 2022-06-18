@@ -19,11 +19,10 @@
                 "top": 100,
                 "bottom": 0
             });
-            var allballs = [new Ball("ball", 50, 50, 0.02, 0, maingame, "img")];
-            var allplayers = [new Player("left","player1", 0, 50, 0, 0, maingame, "img")];
+            var allballs = [new Ball("ball", 50, 50, 0.06, 0, maingame, "img")];
+            var allplayers = [new Player("player1", 0, 50, 0, 0, maingame, "img")];
 
-            maingame.bouncers.push(new Wall({"topleft": [100, 100], "bottomright": [150, 0]}))
-
+            maingame.bouncers.push(new Wall({"topleft": [100, 100], "bottomright": [150, 0]}, goalplayer = allplayers[0]))
 
             allplayers.forEach(player => {
                 maingame.players.push(player);
@@ -48,15 +47,18 @@
         }
 
         class Wall extends StaticGameObject {
-            constructor(hitbox, player = undefined) {
+            constructor(hitbox, player = undefined, goalplayer = undefined) {
                 super();
                 this.hitbox = hitbox;
                 this.player = player;
+                this.goalplayer = goalplayer
             }
             touched(touchedby) {
-                if (typeof touchedby == "Ball") {
-                    if (player != undefined) {
-                        
+                alert("touched called in wall");
+                if (Ball.prototype.isPrototypeOf(touchedby)) {
+                    if (goalplayer != undefined) {
+                        alert("incr score");
+                        goalplayer.score++
                     }
                 }
             }
@@ -119,7 +121,7 @@
             }
 
             class Player extends DynamicGameObject{
-                constructor(goalside, ...args){
+                constructor(...args){
                     super(...args);
 
                     this.score = 0;
@@ -139,10 +141,7 @@
                 }
 
                 touched(gameobject) {
-                    alert("touched called");
-                    if (typeof gameobject == "Ball") {
-                        this.score++
-                    }
+                    alert("touched called in player");
                 }
             }
 
@@ -193,12 +192,8 @@
                     alert("game over")
                 }
                 touchevent(gameobject, obstacle){
-                    obstacle.touched(gameobject)
-                    this.players.forEach(player => {
-                        if (player.goalside === side) {
-                            player.score++
-                        }
-                    });
+                    obstacle.touched(gameobject);
+                    //gameobject.touched(obstacle);
                 }
             }
         </script>
