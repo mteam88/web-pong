@@ -6,13 +6,24 @@
         <link rel="stylesheet" href="static/index.css" />
         <title>Pong</title>
     </head>
-    <body onkeypress="alert('pause');">
+    <body>
         <script>
         window.onerror = function(msg, url, linenumber) {
             alert('Error message: '+msg+'\nURL: '+url+'\nLine Number: '+linenumber);
             return true;
         }
         window.onload = function() {
+            function keyDown(event){
+                //alert(event.keyCode);
+                if (event.keyCode == 87){
+                    allplayers[0].yvelocity += 0.2;
+                } else if (event.keyCode == 83) {
+                    allplayers[0].yvelocity -= 0.2;
+                }
+            }
+
+            document.body.addEventListener('keydown', keyDown);
+        
             var maingame = new Game({
                 "left": 0,
                 "right": 100,
@@ -20,11 +31,11 @@
                 "bottom": 0
             });
             var allballs = [new Ball("ball", 50, 50, -0.1, 0, maingame, "img")];
-            var allplayers = [new Player("player1", 10, 47.5, 0, 0, maingame, "img")];
+            var allplayers = [new Player("player1", 10, 47.5, 0, 0, maingame, "img"), new Player("player2", 88, 47.5, 0, 0, maingame, "img")];
 
             maingame.bouncers.push(new Wall({"topleft": [100, 100], "bottomright": [150, 0]}, allplayers[0]), new Obstacle({"topleft": [0, 0], "bottomright": [100, -50]}), new Obstacle({"topleft": [0, 150], "bottomright": [100, 100]}), new Wall({"topleft": [-50, 100], "bottomright": [0, 0]}), ...allplayers)
 
-            console.log(maingame.bouncers)
+            //console.log(maingame.bouncers)
 
             allplayers.forEach(player => {
                 maingame.players.push(player);
@@ -36,6 +47,8 @@
                     ball.move();
                 });
                 allplayers.forEach(player => {
+                    player.move();
+                    //player.bounce();
                     player.showscore();
                 });
             }, 1);
@@ -131,9 +144,9 @@
                     this.x = 50;
                     this.y = 50;
                     this.bouncer.hitbox['topleft'][0] = this.x;
-                    this.bouncer.hitbox['topleft'][1] = this.y;
-                    this.bouncer.hitbox['bottomright'][0] = this.x+this.elem.style.width;
-                    this.bouncer.hitbox['bottomright'][1] = this.y-this.elem.style.height;
+                    this.bouncer.hitbox['topleft'][1] = this.y-2;
+                    this.bouncer.hitbox['bottomright'][0] = this.x+2;
+                    this.bouncer.hitbox['bottomright'][1] = this.y;
                 }
             }
 
@@ -152,6 +165,20 @@
                     document.body.appendChild(this.scorelabel);
 
                     this.bouncer = new Bouncer({"topleft": [this.x, this.y+5], "bottomright": [this.x+2.5, this.y]})
+                }
+
+                bounce(){
+                    this.game.bouncers.forEach(bouncer => {
+                        if (this.bouncer.isthistouching(bouncer.bouncer)) {
+                            this.game.touchevent(this, bouncer);
+
+                            this.xvelocity = 0;
+                            this.yvelocity = 0;
+
+                            return true;
+                        }
+                        return false;
+                    });
                 }
 
                 showscore() {
@@ -174,13 +201,9 @@
                     //}
                 }
                 FindPoint(x1, y1, x2, y2, x, y) {
-                    console.log(x1, y1, x2, y2, x, y);
                     if (x > x1) {
-                        console.log("1");
                         if (x < x2) {
-                            console.log("2");
                             if (y > y2) {
-                                console.log("3");
                                 if (y < y1) {
                                     return true;
                                 }
@@ -192,8 +215,8 @@
                 }
                 isthistouching(bouncer){
                     //console.log(JSON.stringify(bouncer));
-                    console.log(bouncer.hitbox['topleft']);
-                    console.log(this.hitbox['topleft']);
+                    //console.log(bouncer.hitbox['topleft']);
+                    //console.log(this.hitbox['topleft']);
                     if (this.FindPoint(...bouncer.hitbox['topleft'], ...bouncer.hitbox['bottomright'], ...this.hitbox['topleft']) || this.FindPoint(...bouncer.hitbox['topleft'], ...bouncer.hitbox['bottomright'], ...this.hitbox['topleft'])) {
                         return true;}
                     return false;
