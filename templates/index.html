@@ -6,7 +6,7 @@
         <link rel="stylesheet" href="static/index.css" />
         <title>Pong</title>
     </head>
-    <body>
+    <body onkeypress="alert('pause');">
         <script>
         window.onerror = function(msg, url, linenumber) {
             alert('Error message: '+msg+'\nURL: '+url+'\nLine Number: '+linenumber);
@@ -19,10 +19,12 @@
                 "top": 100,
                 "bottom": 0
             });
-            var allballs = [new Ball("ball", 50, 50, 0.06, 0, maingame, "img")];
-            var allplayers = [new Player("player1", 0, 50, 0, 0, maingame, "img")];
+            var allballs = [new Ball("ball", 50, 50, -0.1, 0, maingame, "img")];
+            var allplayers = [new Player("player1", 10, 47.5, 0, 0, maingame, "img")];
 
-            maingame.bouncers.push(new Wall({"topleft": [100, 100], "bottomright": [150, 0]}, goalplayer = allplayers[0]))
+            maingame.bouncers.push(new Wall({"topleft": [100, 100], "bottomright": [150, 0]}, allplayers[0]), new Obstacle({"topleft": [0, 0], "bottomright": [100, -50]}), new Obstacle({"topleft": [0, 150], "bottomright": [100, 100]}), new Wall({"topleft": [-50, 100], "bottomright": [0, 0]}), ...allplayers)
+
+            console.log(maingame.bouncers)
 
             allplayers.forEach(player => {
                 maingame.players.push(player);
@@ -37,37 +39,41 @@
                     player.showscore();
                 });
             }, 1);
-            alert(JSON.stringify(document.body.getElementsByTagName("*"), null, 4));
         }
 
         class StaticGameObject{
             constructor(hitbox){
-                this.hitbox = new Bouncer(hitbox);
+                this.bouncer = new Bouncer(hitbox);
             }
+            touched(){}
+        }
+
+        class Obstacle extends StaticGameObject{
+            constructor(hitbox){
+                super(hitbox);
+            }   
         }
 
         class Wall extends StaticGameObject {
-            constructor(hitbox, player = undefined, goalplayer = undefined) {
-                super();
-                this.hitbox = hitbox;
+            constructor(hitbox, goalplayer = undefined, player = undefined) {
+                super(hitbox);
                 this.player = player;
-                this.goalplayer = goalplayer
+                this.goalplayer = goalplayer;
             }
             touched(touchedby) {
-                alert("touched called in wall");
                 if (Ball.prototype.isPrototypeOf(touchedby)) {
-                    if (goalplayer != undefined) {
-                        alert("incr score");
-                        goalplayer.score++
+                    if (this.goalplayer !== undefined) {
+                        this.goalplayer.score++
                     }
                 }
             }
         }
 
         class DynamicGameObject{
-                constructor(id, x,y, xvelocity, yvelocity, game, elemtype){
+                constructor(id, x,y, xvelocity, yvelocity, game, elemtype, elemclass){
                     this.elem = document.createElement(elemtype);
                     document.body.appendChild(this.elem);
+                    this.elem.classList.add(elemclass);
                     
                     this.elem.id = id
                     this.id=id;
@@ -77,7 +83,7 @@
                     this.yvelocity=yvelocity;
                     this.game=game;
 
-                    this.bouncer = new Bouncer({"topleft": [this.x, this.y], "bottomright": [this.x+this.elem.style.width, this.y-this.elem.style.height]})
+                    this.bouncer = new Bouncer({"topleft": [this.x, this.y], "bottomright": [parseInt(this.x+this.elem.style.width), parseInt(this.y-this.elem.style.height)]})
                 }
                 move(){
                     //alert(this.elem.src);
@@ -96,44 +102,56 @@
 
             class Ball extends DynamicGameObject{
                 constructor(...args){
-                    super(...args);
+                    super(...args, "ball");
                     this.elem.style.position = "absolute";
                     this.elem.style.left = this.x+"%";
                     this.elem.style.bottom =this.y+"%";
-                    this.elem.classList.add("ball");
                     this.elem.src = "static/ball/ball1.png";
                 }
 
                 bounce(){
                     this.game.bouncers.forEach(bouncer => {
-                        if (this.bouncer.isthistouching(bouncer)) {
-                            alert("bounce");
+                        if (this.bouncer.isthistouching(bouncer.bouncer)) {
                             this.game.touchevent(this, bouncer);
-                            this.xvelocity *= -1;
-                            this.x = 50;
+
                             this.yvelocity *= -1;
-                            this.y = 50;
+                            this.xvelocity *= -1;
+
+                            if (Wall.prototype.isPrototypeOf(bouncer)){
+                                this.reset();
+                            }
+
                             return true;
                         }
                         return false;
                     });
                 }
+
+                reset(){
+                    this.x = 50;
+                    this.y = 50;
+                    this.bouncer.hitbox['topleft'][0] = this.x;
+                    this.bouncer.hitbox['topleft'][1] = this.y;
+                    this.bouncer.hitbox['bottomright'][0] = this.x+this.elem.style.width;
+                    this.bouncer.hitbox['bottomright'][1] = this.y-this.elem.style.height;
+                }
             }
 
             class Player extends DynamicGameObject{
                 constructor(...args){
-                    super(...args);
+                    super(...args, "player");
 
                     this.score = 0;
                     this.elem.style.position = "absolute";
                     this.elem.style.left = this.x+"%";
                     this.elem.style.bottom =this.y+"%";
-                    this.elem.classList.add("player");
                     this.elem.src = "static/player/player1.png";
 
                     this.scorelabel = document.createElement('p');
                     this.scorelabel.classList.add("scorelabel");
                     document.body.appendChild(this.scorelabel);
+
+                    this.bouncer = new Bouncer({"topleft": [this.x, this.y+5], "bottomright": [this.x+2.5, this.y]})
                 }
 
                 showscore() {
@@ -141,7 +159,7 @@
                 }
 
                 touched(gameobject) {
-                    alert("touched called in player");
+                    //alert("touched called in player");
                 }
             }
 
@@ -164,7 +182,7 @@
                             if (y > y2) {
                                 console.log("3");
                                 if (y < y1) {
-                                    alert("pointfound"); return true;
+                                    return true;
                                 }
                             }
                         }
@@ -173,10 +191,10 @@
                     
                 }
                 isthistouching(bouncer){
+                    //console.log(JSON.stringify(bouncer));
                     console.log(bouncer.hitbox['topleft']);
                     console.log(this.hitbox['topleft']);
                     if (this.FindPoint(...bouncer.hitbox['topleft'], ...bouncer.hitbox['bottomright'], ...this.hitbox['topleft']) || this.FindPoint(...bouncer.hitbox['topleft'], ...bouncer.hitbox['bottomright'], ...this.hitbox['topleft'])) {
-                        alert("touching")
                         return true;}
                     return false;
                 }
