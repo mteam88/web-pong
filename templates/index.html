@@ -30,10 +30,13 @@
                 "top": 100,
                 "bottom": 0
             });
-            var allballs = [new Ball("ball", 50, 50, -0.1, 0, maingame, "img")];
-            var allplayers = [new Player("player1", 10, 47.5, 0, 0, maingame, "img"), new Player("player2", 88, 47.5, 0, 0, maingame, "img")];
+            var allballs = [new Ball("ball", 50, 50, 0.2, 0.03, maingame, "img")];
+            var allplayers = [new Player("player1", 10, 47.5, 0, 0, maingame, "img"), new AIPlayer("player2", 88, 47.5, 0, 0, maingame, "img")];
 
-            maingame.bouncers.push(new Wall({"topleft": [100, 100], "bottomright": [150, 0]}, allplayers[0]), new Obstacle({"topleft": [0, 0], "bottomright": [100, -50]}), new Obstacle({"topleft": [0, 150], "bottomright": [100, 100]}), new Wall({"topleft": [-50, 100], "bottomright": [0, 0]}), ...allplayers)
+            maingame.bouncers.push(new Wall({"topleft": [100, 100], "bottomright": [150, 0]}, allplayers[0]), new Obstacle({"topleft": [0, 0], "bottomright": [100, -50]}), new Obstacle({"topleft": [0, 150], "bottomright": [100, 100]}), new Wall({"topleft": [-50, 100], "bottomright": [0, 0]}, allplayers[1]), ...allplayers)
+
+            maingame.allballs = allballs;
+            maingame.allplayers = allplayers;
 
             //console.log(maingame.bouncers)
 
@@ -99,6 +102,7 @@
                     this.bouncer = new Bouncer({"topleft": [this.x, this.y], "bottomright": [parseInt(this.x+this.elem.style.width), parseInt(this.y-this.elem.style.height)]})
                 }
                 move(){
+
                     //alert(this.elem.src);
                     this.x+=this.xvelocity;
                     this.elem.style.left = this.x+"%";
@@ -120,18 +124,33 @@
                     this.elem.style.left = this.x+"%";
                     this.elem.style.bottom =this.y+"%";
                     this.elem.src = "static/ball/ball1.png";
+
+                    this.bouncer = new Bouncer({"topleft": [this.x, this.y+2], "bottomright": [this.x+2, this.y]})
                 }
 
                 bounce(){
+                    console.log(this.xvelocity);
                     this.game.bouncers.forEach(bouncer => {
                         if (this.bouncer.isthistouching(bouncer.bouncer)) {
                             this.game.touchevent(this, bouncer);
 
-                            this.yvelocity *= -1;
-                            this.xvelocity *= -1;
+                            //this.yvelocity *= -1;
+                            
+                            if (Player.prototype.isPrototypeOf(bouncer)) {
+                                this.yvelocity += bouncer.yvelocity;
+                            }
+
 
                             if (Wall.prototype.isPrototypeOf(bouncer)){
+                                //this.yvelocity *= -1;
                                 this.reset();
+                            }
+
+                            if (Obstacle.prototype.isPrototypeOf(bouncer)){
+                                this.yvelocity *= -1;
+                                //this.reset();
+                            } else {
+                                this.xvelocity *= -1.03;
                             }
 
                             return true;
@@ -143,6 +162,8 @@
                 reset(){
                     this.x = 50;
                     this.y = 50;
+                    this.xvelocity = 0.2;
+                    this.yvelocity = Math.random()/8;
                     this.bouncer.hitbox['topleft'][0] = this.x;
                     this.bouncer.hitbox['topleft'][1] = this.y-2;
                     this.bouncer.hitbox['bottomright'][0] = this.x+2;
@@ -164,7 +185,7 @@
                     this.scorelabel.classList.add("scorelabel");
                     document.body.appendChild(this.scorelabel);
 
-                    this.bouncer = new Bouncer({"topleft": [this.x, this.y+5], "bottomright": [this.x+2.5, this.y]})
+                    this.bouncer = new Bouncer({"topleft": [this.x, this.y+23], "bottomright": [this.x+2.5, this.y]})
                 }
 
                 bounce(){
@@ -187,6 +208,26 @@
 
                 touched(gameobject) {
                     //alert("touched called in player");
+                }
+            }
+
+            class AIPlayer extends Player{
+                move() {
+                    if (this.y+10 == this.game.allballs[0].y) {
+                        this.yvelocity = 0;
+                    } else if (this.y+10 < this.game.allballs[0].y) {
+                        this.yvelocity = 0.06;
+                    } else {
+                        this.yvelocity = -0.06;
+                    }
+                    this.y+=this.yvelocity;                    
+                    this.elem.style.bottom = this.y+"%";
+
+                    //update bouncer
+                    this.bouncer.hitbox['topleft'][0] += this.xvelocity;
+                    this.bouncer.hitbox['topleft'][1] += this.yvelocity;
+                    this.bouncer.hitbox['bottomright'][0] += this.xvelocity;
+                    this.bouncer.hitbox['bottomright'][1] += this.yvelocity;
                 }
             }
 
