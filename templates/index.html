@@ -18,13 +18,15 @@
                 if (event.keyCode == 32) {
                     alert("PAUSE: Press enter to unpause");
                 }
+                if (event.keyCode == 66) {
+                    window.location.href = "/";
+                }
                 if (event.keyCode == 87){
                     allplayers[0].yvelocity += 0.2;
                 } else if (event.keyCode == 83) {
                     allplayers[0].yvelocity -= 0.2;
                 }
             }
-
             document.body.addEventListener('keydown', keyDown);
         
             var maingame = new Game({
@@ -33,7 +35,7 @@
                 "top": 100,
                 "bottom": 0
             });
-            var allballs = [new Ball("static/ball/ball1.png", "ball", 50, 50, 0.2, 0.03, maingame, "img")];
+            var allballs = [new Ball("{{ data.ballskin }}", "ball", 50, 50, 0.2, 0.03, maingame, "img")];
             var allplayers = [new Player("{{ data.playerskin }}", "player1", 10, 47.5, 0, 0, maingame, "img"), new AIPlayer("static/player/whiteplayer.png", "player2", 88, 47.5, 0, 0, maingame, "img")];
 
             maingame.bouncers.push(new Wall({"topleft": [100, 100], "bottomright": [150, 0]}, allplayers[0]), new Obstacle({"topleft": [0, 0], "bottomright": [100, -50]}), new Obstacle({"topleft": [0, 150], "bottomright": [100, 100]}), new Wall({"topleft": [-50, 100], "bottomright": [0, 0]}, allplayers[1]), ...allplayers)
