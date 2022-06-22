@@ -34,7 +34,7 @@
                 "bottom": 0
             });
             var allballs = [new Ball("static/ball/ball1.png", "ball", 50, 50, 0.2, 0.03, maingame, "img")];
-            var allplayers = [new Player("static/player/whiteplayer.png", "player1", 10, 47.5, 0, 0, maingame, "img"), new AIPlayer("static/player/whiteplayer.png", "player2", 88, 47.5, 0, 0, maingame, "img")];
+            var allplayers = [new Player("{{ data.playerskin }}", "player1", 10, 47.5, 0, 0, maingame, "img"), new AIPlayer("static/player/whiteplayer.png", "player2", 88, 47.5, 0, 0, maingame, "img")];
 
             maingame.bouncers.push(new Wall({"topleft": [100, 100], "bottomright": [150, 0]}, allplayers[0]), new Obstacle({"topleft": [0, 0], "bottomright": [100, -50]}), new Obstacle({"topleft": [0, 150], "bottomright": [100, 100]}), new Wall({"topleft": [-50, 100], "bottomright": [0, 0]}, allplayers[1]), ...allplayers)
 

@@ -5,11 +5,29 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="static/index.css" />
         <title>Pong</title>
+        <script>
+            function setSkin(skinpath) {
+                //alert("setSkin");
+                fetch('/setplayerskin', {
+                    method: 'POST', 
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({skin: skinpath})
+                });
+            }
+        </script>
     </head>
     <body>
         <p>
             Directions: Press w to move faster up, and s to move faster down. First player to 5 points wins the game. Have fun!
         </p>
         <button onclick="window.location.href = '/pong';"> start </button>
+        <p>Select a skin below:</p>
+        <img src="static/player/whiteplayer.png" class="player" onclick="setSkin(this.src)"/>
+        <img src="static/player/blueplayer.png" class="player" onclick="setSkin(this.src)"/>
+        <img src="static/player/lightblueorangeplayer.png" class="player" onclick="setSkin(this.src)"/>
+        <img src="static/player/redplayer.png" class="player" onclick="setSkin(this.src)"/>
+        <img src="static/player/purplelightblueplayer.png" class="player" onclick="setSkin(this.src)"/>
     </body>
 </html>
