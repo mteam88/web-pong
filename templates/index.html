@@ -33,8 +33,8 @@
                 "top": 100,
                 "bottom": 0
             });
-            var allballs = [new Ball("ball", 50, 50, 0.2, 0.03, maingame, "img")];
-            var allplayers = [new Player("player1", 10, 47.5, 0, 0, maingame, "img"), new AIPlayer("player2", 88, 47.5, 0, 0, maingame, "img")];
+            var allballs = [new Ball("static/ball/ball1.png", "ball", 50, 50, 0.2, 0.03, maingame, "img")];
+            var allplayers = [new Player("static/player/whiteplayer.png", "player1", 10, 47.5, 0, 0, maingame, "img"), new AIPlayer("static/player/whiteplayer.png", "player2", 88, 47.5, 0, 0, maingame, "img")];
 
             maingame.bouncers.push(new Wall({"topleft": [100, 100], "bottomright": [150, 0]}, allplayers[0]), new Obstacle({"topleft": [0, 0], "bottomright": [100, -50]}), new Obstacle({"topleft": [0, 150], "bottomright": [100, 100]}), new Wall({"topleft": [-50, 100], "bottomright": [0, 0]}, allplayers[1]), ...allplayers)
 
@@ -122,12 +122,12 @@
             }
 
             class Ball extends DynamicGameObject{
-                constructor(...args){
+                constructor(skin, ...args){
                     super(...args, "ball");
                     this.elem.style.position = "absolute";
                     this.elem.style.left = this.x+"%";
                     this.elem.style.bottom =this.y+"%";
-                    this.elem.src = "static/ball/ball1.png";
+                    this.elem.src = skin;
 
                     this.bouncer = new Bouncer({"topleft": [this.x, this.y+2], "bottomright": [this.x+2, this.y]})
                 }
@@ -176,19 +176,26 @@
             }
 
             class Player extends DynamicGameObject{
-                constructor(...args){
+                constructor(skin, ...args){
                     super(...args, "player");
 
                     this.score = 0;
                     this.elem.style.position = "absolute";
                     this.elem.style.left = this.x+"%";
                     this.elem.style.bottom =this.y+"%";
-                    this.elem.src = "static/player/player1.png";
+                    this.elem.src = skin;
 
                     this.scorelabel = document.createElement('p');
                     this.scorelabel.classList.add("scorelabel");
                     this.scorelabel.style.left = this.elem.style.left;
                     document.body.appendChild(this.scorelabel);
+
+                    this.playerid = document.createElement('p');
+                    this.playerid.classList.add("playerid");
+                    this.playerid.style.left = this.elem.style.left;
+                    this.playerid.style.top = "8%";
+                    this.playerid.innerHTML = this.id;
+                    document.body.appendChild(this.playerid);
 
                     this.bouncer = new Bouncer({"topleft": [this.x, this.y+23], "bottomright": [this.x+2.5, this.y-5]})
                 }
@@ -208,6 +215,10 @@
                 }
 
                 showscore() {
+                    if (this.score >= 5) {
+                        //alert("GAME OVER");
+                        window.location.href = "/gameover/" + this.id;
+                    }
                     this.scorelabel.innerText = "Score: " + this.score;
                 }
 

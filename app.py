@@ -10,7 +10,7 @@ def pong():
     return render_template("index.html")
 
 @app.route("/gameover/<winner>")
-def gameover():
+def gameover(winner):
     return render_template("gameover.html", data={"winner": winner})
 
 app.run(debug=True)
