@@ -11,4 +11,5 @@
 
 .scorelabel {
     font-size: large;
+    position: absolute;
 }

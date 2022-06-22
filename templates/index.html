@@ -15,6 +15,9 @@
         window.onload = function() {
             function keyDown(event){
                 //alert(event.keyCode);
+                if (event.keyCode == 32) {
+                    alert("PAUSE: Press enter to unpause");
+                }
                 if (event.keyCode == 87){
                     allplayers[0].yvelocity += 0.2;
                 } else if (event.keyCode == 83) {
@@ -50,8 +53,9 @@
                     ball.move();
                 });
                 allplayers.forEach(player => {
-                    player.move();
                     //player.bounce();
+                    player.move();
+                    player.bounce();
                     player.showscore();
                 });
             }, 1);
@@ -137,7 +141,7 @@
                             //this.yvelocity *= -1;
                             
                             if (Player.prototype.isPrototypeOf(bouncer)) {
-                                this.yvelocity += bouncer.yvelocity;
+                                this.yvelocity += bouncer.yvelocity/1.5;
                             }
 
 
@@ -183,9 +187,10 @@
 
                     this.scorelabel = document.createElement('p');
                     this.scorelabel.classList.add("scorelabel");
+                    this.scorelabel.style.left = this.elem.style.left;
                     document.body.appendChild(this.scorelabel);
 
-                    this.bouncer = new Bouncer({"topleft": [this.x, this.y+23], "bottomright": [this.x+2.5, this.y]})
+                    this.bouncer = new Bouncer({"topleft": [this.x, this.y+23], "bottomright": [this.x+2.5, this.y-5]})
                 }
 
                 bounce(){
@@ -216,9 +221,9 @@
                     if (this.y+10 == this.game.allballs[0].y) {
                         this.yvelocity = 0;
                     } else if (this.y+10 < this.game.allballs[0].y) {
-                        this.yvelocity = 0.06;
+                        this.yvelocity = 0.13;
                     } else {
-                        this.yvelocity = -0.06;
+                        this.yvelocity = -0.13;
                     }
                     this.y+=this.yvelocity;                    
                     this.elem.style.bottom = this.y+"%";
